@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAYON MOROCCO LOANS</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        h2 {
+            color: #58a6ff;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 10px;
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2ea44f;
+        }
+        .hidden {
+            display: none;
+        }
+        .alert {
+            background-color: #21262d;
+            border-left: 4px solid #f0883e;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            border-radius: 0 4px 4px 0;
+        }
+        .success-msg {
+            color: #56d364;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .error-msg {
+            color: #ff7b72;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .dashboard-card {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .dashboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #30363d;
+        }
+        .dashboard-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Layon Morocco Loans</h2>
+        
+        <div id="registration-screen">
+            <form id="reg-form">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="fullname" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <button type="submit">Register & Initiate Payment</button>
+            </form>
+        </div>
+
+        <div id="otp-screen" class="hidden">
+            <div class="alert" id="payment-simulation-alert"></div>
+            <p style="margin-bottom: 15px; text-align: center;">A One-Time Password (OTP) has been simulated to your email.</p>
+            <div id="otp-error" class="error-msg hidden"></div>
+            <div class="form-group">
+                <label>Enter OTP</label>
+                <input type="text" id="otp-input" placeholder="Enter the code sent to email">
+            </div>
+            <button id="verify-otp-btn">Verify OTP</button>
+        </div>
+
+        <div id="dashboard-screen" class="hidden">
+            <div class="success-msg">You have successfully registered now you can view your dashboard!</div>
+            
+            <div class="dashboard-card">
+                <h3 style="color: #58a6ff; margin-bottom: 10px; font-size: 16px;">Loan Account Summary</h3>
+                <div class="dashboard-item">
+                    <span>Account Status:</span>
+                    <span style="color: #56d364;">Active</span>
+                </div>
+                <div class="dashboard-item">
+                    <span>Limit Available:</span>
+                    <span>KES 25,000</span>
+                </div>
+                <div class="dashboard-item">
+                    <span>Registration Fee:</span>
+                    <span style="color: #ff7b72;">Paid via 0707486020</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const regForm = document.getElementById('reg-form');
+        const regScreen = document.getElementById('registration-screen');
+        const otpScreen = document.getElementById('otp-screen');
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        
+        const paymentAlert = document.getElementById('payment-simulation-alert');
+        const otpInput = document.getElementById('otp-input');
+        const verifyOtpBtn = document.getElementById('verify-otp-btn');
+        const otpError = document.getElementById('otp-error');
+
+        let expectedOtp = "";
+
+        regForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const gender = document.getElementById('gender').value;
+            const phone = document.getElementById('phone').value;
+
+            if (gender === 'male') {
+                expectedOtp = "234563";
+            } else if (gender === 'female') {
+                expectedOtp = "324234";
+            }
+
+            paymentAlert.innerText = "Payment Request Initiated automatically on merchant number 0707486020 for subscriber " + phone + ". Check your handset to complete.";
+
+            regScreen.classList.add('hidden');
+            otpScreen.classList.remove('hidden');
+        });
+
+        verifyOtpBtn.addEventListener('click', function() {
+            const userOtp = otpInput.value.trim();
+
+            if (userOtp === expectedOtp) {
+                otpScreen.classList.add('hidden');
+                dashboardScreen.classList.remove('hidden');
+            } else {
+                otpError.innerText = "Invalid OTP code. Please check your simulated gender selection rule.";
+                otpError.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+
